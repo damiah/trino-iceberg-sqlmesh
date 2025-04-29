@@ -19,7 +19,7 @@ echo "docker installed"
 sudo systemctl start docker
 sudo usermod -aG docker ec2-user
 echo "ec2-user added to docker group"
-# Setup Docker Compose (v2 plugin)
+# Setup Docker Compose (v2 plugin) -- note the following may differ depending on what machine you're running.
 export HOME=/home/ec2-user
 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
 su - ec2-user -c "mkdir -p $DOCKER_CONFIG/cli-plugins"
@@ -28,22 +28,18 @@ su - ec2-user -c "curl -SL https://github.com/docker/compose/releases/download/v
 echo "docker compose downloaded"
 su - ec2-user -c "chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose"
 echo "docker compose installed"
-# --- Add GitHub SSH Key from ENV Variable ---
-sudo mkdir -p /home/ec2-user/.ssh
-echo "${GITHUB_SSH_KEY}" > /home/ec2-user/.ssh/github
-sudo chmod 600 /home/ec2-user/.ssh/github
-sudo chown ec2-user:ec2-user /home/ec2-user/.ssh/github
-echo "github token copied"
-# Start SSH agent and add key
-eval $(ssh-agent) && ssh-add ~/.ssh/github
-sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
-echo "github token added"
-# clone engineroom-mono and engineroom-sqlmesh
-su - ec2-user -c "export GIT_SSH_COMMAND='ssh -i ~/.ssh/github -o StrictHostKeyChecking=no' && git clone git@github.com:digital360/engineroom-mono.git && git clone git@github.com:digital360/engineroom-sqlmesh.git"
-echo "repo cloned"
+# # --- Add GitHub SSH Key from ENV Variable  (--- 
+# sudo mkdir -p /home/ec2-user/.ssh
+# echo "${GITHUB_SSH_KEY}" > /home/ec2-user/.ssh/github
+# sudo chmod 600 /home/ec2-user/.ssh/github
+# sudo chown ec2-user:ec2-user /home/ec2-user/.ssh/github
+# echo "github token copied"
+# # Start SSH agent and add key
+# eval $(ssh-agent) && ssh-add ~/.ssh/github
+# sudo ssh-keyscan github.com >> ~/.ssh/known_hosts
+# echo "github token added"
 
 # --- Download the required JARs ---
-cd /home/ec2-user/engineroom-mono/data/engineroom-trino
 sudo curl -O https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.11.375/aws-java-sdk-bundle-1.11.375.jar
 sudo curl -O https://repo1.maven.org/maven2/software/amazon/awssdk/aws-java-sdk-s3/1.12.749/aws-java-sdk-s3-1.12.749.jar
 sudo curl -O https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.1/hadoop-aws-3.3.1.jar
@@ -69,10 +65,10 @@ sed -i -E "/<name>javax.jdo.option.ConnectionPassword<\\/name>/{n;s|<value>.*</v
 echo "✅ hive-site.xml has been updated with secret values."
 
 # # --- Start trino and hive with docker compose ---
-su - ec2-user -c "cd /home/ec2-user/engineroom-mono/data/engineroom-trino && docker compose -f docker-compose-prod.yml up -d"
+cd ./trino && docker compose -f docker-compose-dev.yml up -d
 
 # echo "trino and hive started."
 
-su - ec2-user -c "cd /home/ec2-user/engineroom-sqlmesh/trino && docker build --no-cache -t sqlmesh_trino -f Dockerfile ."
+cd ../sqlmesh && docker build --no-cache -t sqlmesh_trino -f Dockerfile .
 
 # echo "sqlmesh image built"
