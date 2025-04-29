@@ -37,6 +37,8 @@ When running for the first time, set IS_RESUME: "false" in the docker-compose-de
 
 # Using SQLMesh
 
+Read the docs: https://sqlmesh.readthedocs.io/en/stable/#contribution
+
 Once the trino and hive containers are up and running, we can use SQLMesh to interact with them and create models.  
 
 The easiest way to do this is to use something like pyenv or conda to create a python virtual environment.  
