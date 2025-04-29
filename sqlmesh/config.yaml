@@ -1,0 +1,37 @@
+gateways:
+  trino_gateway:
+    connection:
+      type: trino
+      user: admin
+      host: {{ env_var('TRINO_HOST') }}
+      port: {{ env_var('TRINO_PORT') }}
+      catalog: iceberg
+      concurrent_tasks: 2
+      http_scheme: http
+      schema_location_mapping:
+        '.*': 's3a://trino-catalog/warehouse/@{schema_name}'
+        '^sqlmesh.*$': 's3a://trino-catalog/warehouse/@{schema_name}'
+        '^sqlmesh__modelling': 's3a://trino-catalog/warehouse/sqlmesh__modelling/@{schema_name}'
+    state_connection:
+      type: postgres
+      database: trino
+      host: {{ env_var('POSTGRES_HOST') }}
+      user: {{ env_var('POSTGRES_USER') }}
+      password: {{ env_var('POSTGRES_PASSWORD') }}
+      port: 5432
+      pre_ping: False
+
+variables:
+  postgres_host: {{ env_var('POSTGRES_HOST') }}
+  postgres_user: {{ env_var('POSTGRES_USER') }}
+  AWS_ACCESS_KEY_ID: {{ env_var('AWS_ACCESS_KEY_ID') }}
+  AWS_SECRET_ACCESS_KEY: {{ env_var('AWS_SECRET_ACCESS_KEY') }}
+  TRINO_HOST: {{ env_var('TRINO_HOST') }}
+  TRINO_PORT: {{ env_var('TRINO_PORT') }}
+  MAX_FORK_WORKERS: 1
+
+default_gateway: trino_gateway
+
+model_defaults:
+  dialect: "trino"
+  start: '2020-01-01'

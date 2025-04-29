@@ -1,0 +1,59 @@
+version: '2.1'
+
+services:
+  trino:
+    image: trinodb/trino:451
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./catalog:/etc/trino/catalog
+      - ./dev-config.properties:/etc/trino/config.properties
+      - ./exchange-manager.properties:/etc/trino/exchange-manager.properties
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+    depends_on:
+      - hive-metastore
+
+  hive-metastore:
+    image: apache/hive:3.1.3
+    container_name: hive-metastore
+    environment:
+      HIVE_METASTORE_URI: thrift://hive-metastore:9083
+      SERVICE_NAME: metastore
+      DB_DRIVER: postgres
+      SERVICE_OPTS: "-Dhive.metastore.schema.verification=false"
+      HIVE_METASTORE_DB_HOSTNAME: ${POSTGRES_HOST}
+      HIVE_METASTORE_DB_NAME: "metastore"
+      HIVE_METASTORE_DB_USER: "root"
+      HIVE_METASTORE_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      HIVE_CLASSPATH: /opt/hive/lib/
+      HADOOP_CLASSPATH: /opt/hadoop/share/hadoop/tools/lib/*
+      HADOOP_HOME: /opt/hadoop
+      HIVE_AUX_JARS_PATH: /opt/hadoop/share/hadoop/tools/lib/aws-java-sdk-core-1.11.375.jar:/opt/hadoop/share/hadoop/tools/lib/aws-java-sdk-s3-1.12.749.jar:/opt/hadoop/share/hadoop/tools/lib/hadoop-aws-3.3.1.jar
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      IS_RESUME: "true"
+    volumes:
+      - ./hive/conf:/opt/hive/conf
+      - type: bind
+        source: ./postgresql-42.5.4.jar
+        target: /opt/hive/lib/postgres.jar
+      - type: bind
+        source: ./aws-java-sdk-bundle-1.11.375.jar
+        target: /opt/hadoop/share/hadoop/tools/lib/aws-java-sdk.jar
+      - type: bind
+        source: ./hadoop-aws-3.3.1.jar
+        target: /opt/hadoop/share/hadoop/tools/lib/hadoop-aws-3.3.1.jar
+      - type: bind
+        source: ./aws-java-sdk-s3-1.12.749.jar
+        target: /opt/hadoop/share/hadoop/tools/lib/aws-java-sdk-s3-1.12.749.jar
+      - type: bind
+        source: ./iceberg-hive-runtime-1.4.0.jar
+        target: /opt/hive/lib/iceberg-hive-runtime-1.4.0.jar
+      - type: bind
+        source: ./iceberg-core-1.4.0.jar
+        target: /opt/hive/lib/iceberg-core-1.4.0.jar
+    ports:
+      - "9083:9083"

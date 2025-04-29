@@ -1,0 +1,112 @@
+<configuration>
+    <!-- Metastore connection settings -->
+    <property>
+        <name>hive.metastore.uris</name>
+        <value>thrift://hive-metastore:9083</value>
+    </property>
+
+    <!-- Use S3 instead of HDFS -->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>s3a://trino-catalog</value>
+    </property>
+
+    <property>
+        <name>iceberg.catalog.hive</name>
+        <value>org.apache.iceberg.mr.hive.HiveIcebergStorageHandler</value>
+    </property>
+
+    <property>
+        <name>hive.metastore.client.capability.check</name>
+        <value>false</value>
+    </property>
+    <!-- S3 Credentials (Can also use IAM roles instead of keys) -->
+    <property>
+        <name>fs.s3a.access.key</name>
+        <value></value>
+    </property>
+    <property>
+        <name>fs.s3.awsAccessKeyId</name>
+        <value></value>
+    </property>
+
+    <property>
+        <name>fs.s3a.secret.key</name>
+        <value></value>
+    </property>
+    <property>
+        <name>fs.s3.awsSecretAccessKey</name>
+        <value></value>
+    </property>
+    <property>
+        <name>fs.s3a.impl</name>
+        <value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+    </property>
+
+    <property>
+        <name>fs.AbstractFileSystem.s3a.impl</name>
+        <value>org.apache.hadoop.fs.s3a.S3A</value>
+    </property>
+
+    <property>
+        <name>fs.s3a.endpoint</name>
+        <value>s3.amazonaws.com</value>
+    </property>
+
+    <!-- Optional: Enable Path-Style Access (for custom S3 endpoints or MinIO) -->
+    <property>
+        <name>fs.s3a.path.style.access</name>
+        <value>true</value>
+    </property>
+
+    <!-- Metadata Store (PostgreSQL on AWS) -->
+    <property>
+        <name>javax.jdo.option.ConnectionURL</name>
+        <value>jdbc:postgresql://your_postgres_instance_host:5432/metastore</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionDriverName</name>
+        <value>org.postgresql.Driver</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionUserName</name>
+        <value>root</value>
+    </property>
+
+    <property>
+        <name>javax.jdo.option.ConnectionPassword</name>
+        <value></value>
+    </property>
+  <property>
+      <name>datanucleus.autoCreateSchema</name>
+      <value>false</value>
+   </property>
+   <property>
+      <name>datanucleus.fixedDatastore</name>
+      <value>true</value>
+   </property>
+   <property>
+      <name>datanucleus.autoCreateTables</name>
+      <value>True</value>
+   </property>
+    <!-- Set S3 file output format (Parquet recommended) -->
+    <property>
+        <name>hive.default.fileformat</name>
+        <value>Parquet</value>
+    </property>
+    <property>
+        <name>hive.metastore.authorization.storage.checks</name>
+        <value>false</value>
+    </property>
+    <!-- Disable Hadoop Dependency -->
+    <property>
+        <name>hive.metastore.warehouse.dir</name>
+        <value>s3a://trino-catalog/warehouse</value>
+    </property>
+    <property>
+        <name>hive.metastore.disallow.incompatible.col.type.changes</name>
+        <value>false</value>
+    </property>
+</configuration>

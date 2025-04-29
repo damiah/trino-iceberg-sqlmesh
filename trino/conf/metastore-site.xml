@@ -1,0 +1,23 @@
+<configuration>
+<property>
+<name>hive.metastore.pre.event.listeners</name>
+<name>org.apache.hadoop.hive.ql.security.authorization.AuthorizationPreEventListener</name>
+</property>
+<property>
+<name>hive.security.metastore.authorization.manager</name>
+<value>org.apache.hadoop.hive.ql.security.authorization.StorageBasedAuthorizationProvider</value>
+</property>
+  <property>
+    <name>metastore.thrift.uris</name>
+    <value>thrift://localhost:9083</value>
+    <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
+  </property>
+  <property>
+    <name>metastore.task.threads.always</name>
+    <value>org.apache.hadoop.hive.metastore.events.EventCleanerTask</value>
+  </property>
+  <property>
+    <name>metastore.expression.proxy</name>
+    <value>org.apache.hadoop.hive.metastore.DefaultPartitionExpressionProxy</value>
+  </property>
+  </configuration>
